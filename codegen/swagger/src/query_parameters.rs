@@ -10,6 +10,8 @@ use serde_repr::Serialize_repr;
 use std::collections::HashMap;
 use std::hash::Hash;
 
+use crate::models::Ipam;
+
 pub(crate) fn serialize_as_json<T, S>(t: &T, s: S) -> Result<S::Ok, S::Error>
 where
     T: Serialize,
@@ -2810,6 +2812,171 @@ impl InspectNetworkOptionsBuilder {
     /// `NetworkInspect` API
     pub fn build(self) -> InspectNetworkOptions {
         self.inner
+    }
+}
+
+/// Builder for the `NetworkCreate` API query parameter.
+///
+/// Create a network.
+///
+/// ## Examples
+///
+/// ```rust
+/// use bollard_stubs::query_parameters::CreateNetworkOptionsBuilder;
+///
+/// let params = CreateNetworkOptionsBuilder::new()
+/// //  .name(/* ... */)
+/// //  .check_duplicate(/* ... */)
+/// //  .driver(/* ... */)
+/// //  .internal(/* ... */)
+/// //  .attachable(/* ... */)
+/// //  .ingress(/* ... */)
+/// //  .ipam(/* ... */)
+/// //  .enable_ipv6(/* ... */)
+/// //  .options(/* ... */)
+/// //  .labels(/* ... */)
+///     .build();
+/// ```
+#[derive(Debug, Clone, Default, PartialEq, Serialize)]
+pub struct CreateNetworkOptionsBuilder {
+    inner: CreateNetworkOptions,
+}
+
+impl CreateNetworkOptionsBuilder {
+    /// Construct a builder of query parameters for CreateNetworkOptions using defaults.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// The network's name.
+    pub fn name(mut self, name: &str) -> Self {
+        self.inner.name = name.into();
+        self
+    }
+
+    /// Check for networks with duplicate names. Since Network is primarily keyed based on a random
+    /// ID and not on the name, and network name is strictly a user-friendly alias to the network
+    /// which is uniquely identified using ID, there is no guaranteed way to check for duplicates.
+    /// CheckDuplicate is there to provide a best effort checking of any networks which has the
+    /// same name but it is not guaranteed to catch all name collisions.
+    pub fn check_duplicate(mut self, check_duplicate: bool) -> Self {
+        self.inner.check_duplicate = Some(check_duplicate);
+        self
+    }
+
+    /// Name of the network driver plugin to use.
+    pub fn driver(mut self, driver: &str) -> Self {
+        self.inner.driver = Some(driver.into());
+        self
+    }
+
+    /// Restrict external access to the network.
+    pub fn internal(mut self, internal: bool) -> Self {
+        self.inner.internal = Some(internal);
+        self
+    }
+
+    /// Globally scoped network is manually attachable by regular containers from workers in swarm mode.
+    pub fn attachable(mut self, attachable: bool) -> Self {
+        self.inner.attachable = Some(attachable);
+        self
+    }
+
+    /// Ingress network is the network which provides the routing-mesh in swarm mode.
+    pub fn ingress(mut self, ingress: bool) -> Self {
+        self.inner.ingress = Some(ingress);
+        self
+    }
+
+    /// Controls IP address management when creating a network.
+    pub fn ipam(mut self, ipam: &Ipam) -> Self {
+        self.inner.ipam = Some(ipam.clone());
+        self
+    }
+
+    /// Enable IPv6 on the network.
+    pub fn enable_ipv6(mut self, enable_ipv6: bool) -> Self {
+        self.inner.enable_ipv6 = Some(enable_ipv6);
+        self
+    }
+
+    /// Network specific options to be used by the drivers.
+    pub fn options(mut self, options: &HashMap<impl Into<String> + Clone, impl Into<String> + Clone>) -> Self {
+        let mut inner_options = HashMap::new();
+        for (key, value) in options {
+            inner_options.insert(
+                Into::<String>::into(key.clone()),
+                Into::<String>::into(value.clone()),
+            );
+        }
+        self.inner.options = Some(inner_options);
+        self
+    }
+    
+    /// User-defined key/value metadata.
+    pub fn labels(mut self, labels: &HashMap<impl Into<String> + Clone, impl Into<String> + Clone>) -> Self {
+        let mut inner_labels = HashMap::new();
+        for (key, value) in labels {
+            inner_labels.insert(
+                Into::<String>::into(key.clone()),
+                Into::<String>::into(value.clone()),
+            );
+        }
+        self.inner.labels = Some(inner_labels);
+        self
+    }
+
+    /// Consume this builder and use the `CreateNetworkOptions` as parameter to the
+    /// `NetworkCreate` API
+    pub fn build(self) -> CreateNetworkOptions {
+        self.inner
+    }
+
+}
+
+/// Internal struct used in the `NetworkCreate` API
+/// 
+/// Use a [CreateNetworkOptionsBuilder] to instantiate this struct.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct CreateNetworkOptions {
+    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub check_duplicate: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub driver: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub internal: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub attachable: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ingress: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "IPAM")]
+    pub ipam: Option<Ipam>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "EnableIPv6")]
+    pub enable_ipv6: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub options: Option<HashMap<String, String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub labels: Option<HashMap<String, String>>,
+}
+
+impl Default for CreateNetworkOptions
+{
+    fn default() -> Self {
+        Self {
+            name: Default::default(),
+            check_duplicate: None,
+            driver: None,
+            internal: None,
+            attachable: None,
+            ingress: None,
+            ipam: None,
+            enable_ipv6: None,
+            options: None,
+            labels: None,
+        }
     }
 }
 
