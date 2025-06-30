@@ -262,7 +262,7 @@ impl Docker {
     /// ```
     pub async fn create_volume(
         &self,
-        config: impl Into<VolumeCreateOptions>,
+        config: impl Into<crate::query_parameters::CreateVolumeOptions>,
     ) -> Result<Volume, Error> {
         let url = "/volumes/create";
 

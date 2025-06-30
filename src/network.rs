@@ -349,7 +349,7 @@ impl Docker {
     /// ```
     pub async fn create_network(
         &self,
-        config: impl Into<NetworkCreateRequest>,
+        config: impl Into<crate::query_parameters::CreateNetworkOptions>,
     ) -> Result<NetworkCreateResponse, Error> {
         let url = "/networks/create";
 
